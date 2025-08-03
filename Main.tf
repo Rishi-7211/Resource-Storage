@@ -10,7 +10,7 @@ terraform {
     resource_group_name  = "Rishi_RG"
     storage_account_name = "storage72111"
     container_name       = "terraformconatiner"
-    key                  = "prod.terraform.tfstate"
+    key                  = "prod.tfstate"
   }
 
 }
