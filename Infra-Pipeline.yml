@@ -7,17 +7,17 @@ steps:
 - task: TerraformInstaller@1
   displayName: 'Terraform Installation'
   inputs:
-    terraformVersion: 'latest'
+    terraformVersion: '1.8.2'  # Or use 'latest' if you prefer
 
 - task: TerraformTask@5
-  displayName: 'Terraform Login'
+  displayName: 'Terraform Init'
   inputs:
     provider: 'azurerm'
     command: 'init'
     backendServiceArm: 'Federation_connection_pipeline'
     backendAzureRmResourceGroupName: 'Rishi_RG'
     backendAzureRmStorageAccountName: 'storage72111'
-    backendAzureRmContainerName: 'terraformconatiner'
+    backendAzureRmContainerName: 'terraformcontainer'  # ✅ Fixed spelling
     backendAzureRmKey: 'Prod.tfstate'
 
 - task: TerraformTask@5
@@ -25,11 +25,11 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'validate'
+    environmentServiceNameAzureRM: 'Federation_connection_pipeline'  # ✅ Added for auth
 
 - task: TerraformTask@5
   displayName: 'Terraform Plan'
   inputs:
     provider: 'azurerm'
     command: 'plan'
-    backendServiceArm: 'Federation_connection_pipeline'
-
+    environmentServiceNameAzureRM: 'Federation_connection_pipeline'  # ✅ Needed for auth
