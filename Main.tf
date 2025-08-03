@@ -8,7 +8,7 @@ terraform {
   }
   backend "azurerm" {
     resource_group_name  = "Rishi_RG"
-    storage_account_name = "storage7211"
+    storage_account_name = "storage72111"
     container_name       = "terraformconatiner"
     key                  = "prod.terraform.tfstate"
   }
@@ -16,7 +16,7 @@ terraform {
 }
 provider "azurerm" {
   features {}
-  subscription_id = "16a05a8e-7ba4-486d-8521-57e717aedbbd"
+  subscription_id = "2152b8fd-4dc5-47a1-8df7-361e1b4e4a6f"
 }
 resource "azurerm_resource_group" "motorg" {
   name     = "MotoRG"
