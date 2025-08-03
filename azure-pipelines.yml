@@ -14,7 +14,7 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'init'
-    backendServiceArm: 'Federation_service_connection'
+    backendServiceArm: 'Federation_connection_pipeline'
     backendAzureRmResourceGroupName: 'Rishi_RG'
     backendAzureRmStorageAccountName: 'storage72111'
     backendAzureRmContainerName: 'terraformconatiner'
@@ -31,5 +31,5 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'plan'
-    backendServiceArm: 'Federation_service_connection'
+    backendServiceArm: 'Federation_connection_pipeline'
 
