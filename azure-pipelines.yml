@@ -1,18 +1,46 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger: none
 
 pool: Devops_Pipline
-  
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+- stage: TerraformStage
+  jobs:
+  - job: TerraformJob
+    steps:
+    - task: PowerShell@2
+      displayName: 'Terraform Installer'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Check if Terraform is already installed
+          $terraform = Get-Command terraform -ErrorAction SilentlyContinue
+          
+          if ($terraform) {
+              Write-Host "Terraform is already installed at $($terraform.Source)" -ForegroundColor Green
+          } else {
+              Write-Host "Terraform not found. Installing..." -ForegroundColor Yellow
+          
+              $terraformVersion = "1.8.4"
+              $zipUrl = "https://releases.hashicorp.com/terraform/$terraformVersion/terraform_${terraformVersion}_windows_amd64.zip"
+              $zipPath = "$env:TEMP\terraform.zip"
+              $installPath = "C:\Terraform"
+          
+              if (-Not (Test-Path -Path $installPath)) {
+                  New-Item -ItemType Directory -Path $installPath | Out-Null
+              }
+          
+              Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+              Expand-Archive -Path $zipPath -DestinationPath $installPath -Force
+          
+              $env:Path += ";$installPath"
+              [Environment]::SetEnvironmentVariable("Path", [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";$installPath", "Machine")
+          
+              Write-Host "Terraform $terraformVersion installed successfully at $installPath" -ForegroundColor Green
+          }
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    - task: PowerShell@2
+      displayName: 'Terraform Login with Service Principal'
+      inputs:
+        targetType: 'inline'
+        script: |
+          az login --service-principal -u "$(SP_APP_ID)" -p "$(SP_PASSWORD)" --tenant "$(SP_TENANT)"
