@@ -1,38 +1,57 @@
-# Starter pipeline
-
 trigger: none
 
+pool:
+  name: DevSecops_Agent
 
-pool: 
-  name: DevSecops_Agent 
-  
+stages:
 
-steps:
-- task: TerraformInstaller@1
-  displayName: 'Terraform Installation'
-  inputs:
-    terraformVersion: 'latest'
+# -------------------------
+# Stage 1: Init & Validate
+# -------------------------
+- stage: Init_Validate
+  displayName: "Terraform Init and Validate"
+  jobs:
+    - job: InitValidate
+      steps:
+        - task: TerraformInstaller@1
+          displayName: 'Terraform Installation'
+          inputs:
+            terraformVersion: 'latest'
 
-- task: TerraformTask@5
-  displayName: 'Terraform Init'
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    backendServiceArm: 'DevSecOps_Federation'
-    backendAzureRmResourceGroupName: 'Vaishanvi_RG'
-    backendAzureRmStorageAccountName: 'vaishanvistorage'
-    backendAzureRmContainerName: 'vaishanvicontainer'
-    backendAzureRmKey: 'prod.terraform.tfstate'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Init'
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'DevSecOps_Federation'
+            backendAzureRmResourceGroupName: 'Vaishanvi_RG'
+            backendAzureRmStorageAccountName: 'vaishanvistorage'
+            backendAzureRmContainerName: 'vaishanvicontainer'
+            backendAzureRmKey: 'prod.terraform.tfstate'
 
-- task: TerraformTask@5
-  displayName: 'Terrafrom Validate'
-  inputs:
-    provider: 'azurerm'
-    command: 'validate'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Validate'
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
 
-- task: TerraformTask@5
-  displayName: 'Terraform Plan'
-  inputs:
-    provider: 'azurerm'
-    command: 'plan'
-    environmentServiceNameAzureRM: 'DevSecOps_Federation'
+# ---------------------
+# Stage 2: Terraform Plan
+# ---------------------
+- stage: Plan
+  displayName: "Terraform Plan"
+  dependsOn: Init_Validate
+  jobs:
+    - job: TerraformPlan
+      steps:
+        - task: TerraformInstaller@1
+          displayName: 'Terraform Installation'
+          inputs:
+            terraformVersion: 'latest'
+
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Plan'
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            environmentServiceNameAzureRM: 'DevSecOps_Federation'
