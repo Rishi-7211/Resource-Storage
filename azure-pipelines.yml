@@ -22,6 +22,7 @@ steps:
     backendAzureRmKey: 'Prode.tfstate'
 
 - task: TerraformTask@5
+  displayName: 'Terraform Plan'
   inputs:
     provider: 'azurerm'
     command: 'plan'
