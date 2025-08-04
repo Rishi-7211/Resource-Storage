@@ -5,13 +5,6 @@ terraform {
       version = "4.27.1"
     }
   }
-  backend "azurerm" {
-    resource_group_name  = "Rishi_RG"
-    storage_account_name = "storage72111"
-    container_name       = "terraformcontainer"
-    key                  = "prod.tfstate"
-  }
-
 }
 provider "azurerm" {
   features {}
