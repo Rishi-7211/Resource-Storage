@@ -19,12 +19,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "motorg" {
-  name     = "MotoRG1"
+  name     = "MotoRG12"
   location = "East US"
 }
 resource "azurerm_storage_account" "motoacc" {
-  name                     = "motostorageaccount981"
-  resource_group_name      = "MotoRG1"
+  name                     = "motostorageaccount9817"
+  resource_group_name      = "MotoRG12"
   location                 = "West US"
   account_tier             = "Standard"
   account_replication_type = "LRS"
