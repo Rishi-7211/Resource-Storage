@@ -1,0 +1,65 @@
+# azure-pipelines.yml
+
+trigger:
+- none
+
+parameters:
+  - name: action
+    displayName: 'Terraform Action'
+    type: string
+    default: 'all'
+    values:
+      - init
+      - validate
+      - plan
+      - apply
+      - all
+
+pool:
+  name: DevSecops_Agent
+
+steps:
+- task: TerraformInstaller@1
+  displayName: 'Terraform Installation'
+  inputs:
+    terraformVersion: 'latest'
+
+# Terraform Init
+- ${{ if or(eq(parameters.action, 'init'), eq(parameters.action, 'all')) }}:
+  - task: TerraformTask@5
+    displayName: 'Terraform Init'
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      backendServiceArm: 'DevSecOps_Federation'
+      backendAzureRmResourceGroupName: 'Vaishanvi_RG'
+      backendAzureRmStorageAccountName: 'vaishanvistorage'
+      backendAzureRmContainerName: 'vaishanvicontainer'
+      backendAzureRmKey: 'Prod.terraform.tfstate'
+      commandOptions: '-reconfigure'
+
+# Terraform Validate
+- ${{ if or(eq(parameters.action, 'validate'), eq(parameters.action, 'all')) }}:
+  - task: TerraformTask@5
+    displayName: 'Terraform Validate'
+    inputs:
+      provider: 'azurerm'
+      command: 'validate'
+
+# Terraform Plan
+- ${{ if or(eq(parameters.action, 'plan'), eq(parameters.action, 'all')) }}:
+  - task: TerraformTask@5
+    displayName: 'Terraform Plan'
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      environmentServiceNameAzureRM: 'DevSecOps_Federation'
+
+# Terraform Apply
+- ${{ if or(eq(parameters.action, 'apply'), eq(parameters.action, 'all')) }}:
+  - task: TerraformTask@5
+    displayName: 'Terraform Apply'
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      environmentServiceNameAzureRM: 'DevSecOps_Federation'
