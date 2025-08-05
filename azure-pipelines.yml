@@ -5,11 +5,15 @@ pool:
   name: DevSecops_Agent
 
 stages:
-# Stage 1 - Terraform Init, Validate, Plan
+
+# --------------------------
+# Stage 1: Init + Validate + Plan
+# --------------------------
 - stage: Terraform_Preparation
-  displayName: 'Terraform Init, Validate, Plan'
+  displayName: 'Terraform Init, Validate & Plan'
   jobs:
-  - job: TerraformInitValidatePlan
+  - job: InitValidatePlan
+    displayName: 'Init, Validate & Plan'
     steps:
     - task: TerraformInstaller@1
       displayName: 'Install Terraform'
@@ -17,7 +21,7 @@ stages:
         terraformVersion: 'latest'
 
     - task: TerraformTask@5
-      displayName: 'Terraform Init'
+      displayName: 'Terraform Init (Stage 1)'
       inputs:
         provider: 'azurerm'
         command: 'init'
@@ -26,6 +30,7 @@ stages:
         backendAzureRmStorageAccountName: 'vaishanvistorage'
         backendAzureRmContainerName: 'vaishanvicontainer'
         backendAzureRmKey: 'Prod.terraform.tfstate'
+        commandOptions: '-reconfigure'
 
     - task: TerraformTask@5
       displayName: 'Terraform Validate'
@@ -40,18 +45,33 @@ stages:
         command: 'plan'
         environmentServiceNameAzureRM: 'DevSecOps_Federation'
 
-# Stage 2 - Terraform Apply
+# --------------------------
+# Stage 2: Apply (with Init)
+# --------------------------
 - stage: Terraform_Apply
-  displayName: 'Terraform Apply'
+  displayName: 'Terraform Apply Stage'
   dependsOn: Terraform_Preparation
   condition: succeeded()
   jobs:
-  - job: TerraformApply
+  - job: Apply
+    displayName: 'Terraform Init & Apply'
     steps:
     - task: TerraformInstaller@1
       displayName: 'Install Terraform'
       inputs:
         terraformVersion: 'latest'
+
+    - task: TerraformTask@5
+      displayName: 'Terraform Init (Stage 2)'
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'DevSecOps_Federation'
+        backendAzureRmResourceGroupName: 'Vaishanvi_RG'
+        backendAzureRmStorageAccountName: 'vaishanvistorage'
+        backendAzureRmContainerName: 'vaishanvicontainer'
+        backendAzureRmKey: 'Prod.terraform.tfstate'
+        commandOptions: '-reconfigure'
 
     - task: TerraformTask@5
       displayName: 'Terraform Apply'
