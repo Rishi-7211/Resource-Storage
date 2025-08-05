@@ -1,19 +1,18 @@
 # azure-pipelines.yml
 
-trigger:
-- none
+trigger: none  # Automatic trigger band
 
 parameters:
-  - name: action
-    displayName: 'Terraform Action'
-    type: string
-    default: 'all'
-    values:
-      - init
-      - validate
-      - plan
-      - apply
-      - all
+- name: action
+  displayName: 'Terraform Action to Run'
+  type: string
+  default: 'all'
+  values:
+    - init
+    - validate
+    - plan
+    - apply
+    - all
 
 pool:
   name: DevSecops_Agent
