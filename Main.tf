@@ -17,7 +17,7 @@ provider "azurerm" {
   features {}
   subscription_id = "50fb151d-0992-4631-9cc9-86f052a3e0b0"
 }
-}
+
 resource "azurerm_resource_group" "motorg" {
   name     = "MotoRG1"
   location = "East US"
