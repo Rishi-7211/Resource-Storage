@@ -1,47 +1,61 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - none
 
 pool:
   name: DevSecops_Agent
 
-steps:
-- task: TerraformInstaller@1
-  displayName: 'Terraform Installer'
-  inputs:
-    terraformVersion: 'latest'
+stages:
+# Stage 1 - Terraform Init, Validate, Plan
+- stage: Terraform_Preparation
+  displayName: 'Terraform Init, Validate, Plan'
+  jobs:
+  - job: TerraformInitValidatePlan
+    steps:
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: 'latest'
 
-- task: TerraformTask@5
-  displayName: 'Terraform Init'
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    backendServiceArm: 'DevSecOps_Federation'
-    backendAzureRmResourceGroupName: 'Vaishanvi_RG'
-    backendAzureRmStorageAccountName: 'vaishanvistorage'
-    backendAzureRmContainerName: 'vaishanvicontainer'
-    backendAzureRmKey: 'Prod.terraform.tfsate'
+    - task: TerraformTask@5
+      displayName: 'Terraform Init'
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'DevSecOps_Federation'
+        backendAzureRmResourceGroupName: 'Vaishanvi_RG'
+        backendAzureRmStorageAccountName: 'vaishanvistorage'
+        backendAzureRmContainerName: 'vaishanvicontainer'
+        backendAzureRmKey: 'Prod.terraform.tfstate'
 
-- task: TerraformTask@5
-  displayName: 'Terraform Validate'
-  inputs:
-    provider: 'azurerm'
-    command: 'validate'
+    - task: TerraformTask@5
+      displayName: 'Terraform Validate'
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
 
-- task: TerraformTask@5
-  displayName: 'Terraform Plan'
-  inputs:
-    provider: 'azurerm'
-    command: 'plan'
-    environmentServiceNameAzureRM: 'DevSecOps_Federation'
+    - task: TerraformTask@5
+      displayName: 'Terraform Plan'
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        environmentServiceNameAzureRM: 'DevSecOps_Federation'
 
-- task: TerraformTask@5
+# Stage 2 - Terraform Apply
+- stage: Terraform_Apply
   displayName: 'Terraform Apply'
-  inputs:
-    provider: 'azurerm'
-    command: 'apply'
-    environmentServiceNameAzureRM: 'DevSecOps_Federation'
+  dependsOn: Terraform_Preparation
+  condition: succeeded()
+  jobs:
+  - job: TerraformApply
+    steps:
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: TerraformTask@5
+      displayName: 'Terraform Apply'
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        environmentServiceNameAzureRM: 'DevSecOps_Federation'
