@@ -1,0 +1,37 @@
+#Azure Pipeline
+
+trigger:
+- none
+
+pool:
+  name: DevSecops_Agent
+
+steps:
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: 'latest'
+
+- task: TerraformTask@5
+  displayName: 'Terraform Init'
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'DevSecOps_Federation'
+    backendAzureRmResourceGroupName: 'Vaishanvi_RG'
+    backendAzureRmStorageAccountName: 'vaishanvistorage'
+    backendAzureRmContainerName: 'vaishanvicontainer'
+    backendAzureRmKey: 'Dev.terraform.tfstate'
+
+- task: TerraformTask@5
+  displayName: 'Terraform Plan'
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'DevSecOps_Federation'
+
+- task: TerraformTask@5
+  displayName: 'Terraform Apply'
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    environmentServiceNameAzureRM: 'DevSecOps_Federation'
