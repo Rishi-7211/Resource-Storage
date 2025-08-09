@@ -15,6 +15,7 @@ stages:
     displayName: "Init and Plan"
     steps:
     - task: TerraformInstaller@1
+      displayName: 'Terraform Installation'
       inputs:
         terraformVersion: 'latest'
 
