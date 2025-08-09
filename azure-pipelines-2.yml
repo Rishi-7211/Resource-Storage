@@ -19,6 +19,7 @@ stages:
         terraformVersion: 'latest'
 
     - task: TerraformTask@5
+      displayName: 'Terraform Init'
       inputs:
         provider: 'azurerm'
         command: 'init'
@@ -29,6 +30,7 @@ stages:
         backendAzureRmKey: 'Prod.tfstate'
 
     - task: TerraformTask@5
+      displayName: 'Terraform Plan'
       inputs:
         provider: 'azurerm'
         command: 'plan'
