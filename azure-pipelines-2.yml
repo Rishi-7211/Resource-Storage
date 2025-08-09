@@ -1,0 +1,52 @@
+trigger:
+  branches:
+    include:
+      - feature/*
+
+pool:
+  name: DevSecops_Agent
+
+stages:
+# ------------------------ Stage 1: Terraform Plan ------------------------
+- stage: Plan
+  jobs:
+  - job: TerraformPlan
+    steps:
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: TerraformTaskV5@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'DevSecOps_Federation'
+        backendAzureRmResourceGroupName: 'Vaishanvi_RG'
+        backendAzureRmStorageAccountName: 'vaishanvistorage'
+        backendAzureRmContainerName: 'vaishanvicontainer'
+        backendAzureRmKey: 'Prod.tfstate'
+
+    - task: TerraformTaskV5@5
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        environmentServiceNameAzureRM: 'DevSecOps_Federation'
+
+# ------------------------ Stage 2: Terraform Apply (Manual Approval) ------------------------
+- stage: Apply
+  dependsOn: Plan
+  condition: succeeded()
+  approval:
+    approvals:
+      - name: Manual Approval
+        reviewers:
+          - <your-azure-devops-username-or-group>
+
+  jobs:
+  - job: TerraformApply
+    steps:
+    - task: TerraformTaskV5@5
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        environmentServiceNameAzureRM: 'DevSecOps_Federation'
