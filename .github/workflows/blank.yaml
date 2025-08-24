@@ -1,4 +1,4 @@
-name: Workflow Name # Optional, describes the workflow
+name: Terraform Workflow
 
 on:
   push:
@@ -6,8 +6,25 @@ on:
       - main
       - 'releases/**'
 
-jobs: # Defines the jobs to run
-  job_name: # Unique identifier for the job
+jobs:
+  terraform-job:
     runs-on: Github_Agent
-    steps: # Steps to execute in the job
-     
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0 # Use your required version
+
+      - name: Terraform Login
+        env:
+          TF_CLOUD_TOKEN: ${{ secrets.TF_CLOUD_TOKEN }}
+        run: |
+          terraform login
+
+      - name: Terraform Init
+        run: terraform init
+
