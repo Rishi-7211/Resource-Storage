@@ -1,0 +1,13 @@
+name: Workflow Name # Optional, describes the workflow
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+
+jobs: # Defines the jobs to run
+  job_name: # Unique identifier for the job
+    runs-on: Github_Agent
+    steps: # Steps to execute in the job
+     
