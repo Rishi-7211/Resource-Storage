@@ -10,29 +10,27 @@ jobs:
     runs-on: Github_Agent
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Login to Azure using the AZURE_CREDENTIALS secret
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Set up Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.0
 
-      # Initialize Terraform
       - name: Terraform Init
         run: terraform init
 
-      # Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
-      # Terraform Apply
+      - name: Show Terraform Plan
+        run: terraform show tfplan
+
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
