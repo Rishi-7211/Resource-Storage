@@ -1,34 +1,38 @@
-name: Terraform Workflow
+name: Terraform on Azure
 
 on:
   push:
     branches:
       - main
-      - 'releases/**'
 
 jobs:
-  terraform-job:
+  terraform:
     runs-on: Github_Agent
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
+      # Login to Azure using the AZURE_CREDENTIALS secret
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Set up Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.0 # Use your required version
+          terraform_version: 1.5.0
 
-      - name: Terraform Login
-        env:
-          TF_CLOUD_TOKEN: ${{ secrets.AZURE_CREDENTIALS }}
-        run: |
-          terraform login
-
+      # Initialize Terraform
       - name: Terraform Init
         run: terraform init
-      - name: Terraform Plan
-        run: terraform plan
-      - name: Terraform Apply
-        run: Terraform apply --auto-approve
 
+      # Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
