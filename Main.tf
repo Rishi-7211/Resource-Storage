@@ -6,16 +6,16 @@ terraform {
     }
   }
   backend "azurerm" {
-    resource_group_name   = "Vaishanvi_RG"
-    storage_account_name  = "vaishanvistorage"
-    container_name        = "vaishanvicontainer"
+    resource_group_name   = "App_RG"
+    storage_account_name  = "appstg"
+    container_name        = "appcontainer"
     key                   = "prod.terraform.tfstate"
   }
 }
 
 provider "azurerm" {
   features {}
-  subscription_id = "50fb151d-0992-4631-9cc9-86f052a3e0b0"
+  subscription_id = "88fc7642-e677-4cd7-b276-4d2f8cc6ad1d"
 }
 
 resource "azurerm_resource_group" "motorg" {
