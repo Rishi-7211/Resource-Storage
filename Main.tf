@@ -22,6 +22,10 @@ resource "azurerm_resource_group" "motorg" {
   name     = "MotoRG12"
   location = "East US"
 }
+resource "azurerm_resource_group" "motorg1" {
+  name     = "MotoRG123"
+  location = "East US"
+}
 
 resource "azurerm_storage_account" "motoacc" {
   name                     = "motostorageaccount9817"
