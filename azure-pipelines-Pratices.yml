@@ -1,0 +1,23 @@
+trigger: none
+
+pool: DevSecops_Agent
+
+steps:
+- task: TerraformInstaller@1
+  displayName: Terraform Installation
+  inputs:
+    terraformVersion: 'latest'
+- task: TerraformTask@5
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'Azure_Devops_Federation'
+    backendAzureRmResourceGroupName: 'App_RG'
+    backendAzureRmStorageAccountName: 'appstg'
+    backendAzureRmContainerName: 'appcontainer'
+    backendAzureRmKey: 'prod.terraform.tfstate'
+- task: TerraformTask@5
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'Azure_Devops_Federation'
