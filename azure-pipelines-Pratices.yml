@@ -1,4 +1,9 @@
-trigger: none
+trigger: 
+  branches:
+    include:
+      - main
+      - feature/*
+
 
 pool: DevSecops_Agent
 
@@ -8,6 +13,7 @@ steps:
   inputs:
     terraformVersion: 'latest'
 - task: TerraformTask@5
+  displayName: Terraform Init
   inputs:
     provider: 'azurerm'
     command: 'init'
@@ -17,6 +23,7 @@ steps:
     backendAzureRmContainerName: 'appcontainer'
     backendAzureRmKey: 'prod.terraform.tfstate'
 - task: TerraformTask@5
+  displayName: Terraform Plan
   inputs:
     provider: 'azurerm'
     command: 'plan'
